@@ -1,16 +1,36 @@
-import "../src/index.css";
+import "../src/index.css"; // Ensure this path is correct
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function App() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();  
 
-  const handleSubmit = (e) => {
-    e.preventDefault();  
-    console.log("Username:", username);
-    console.log("Password:", password);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Login successful!');
+        // Optionally navigate to another page after successful login
+        // navigate("/dashboard"); // Example: navigate to a dashboard
+      } else {
+        alert(data.message || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('An error occurred. Please try again later.');
+    }
   };
 
   const handleSignUpClick = () => {
@@ -23,17 +43,17 @@ function App() {
         <h1 className="text-2xl font-bold mb-6 text-center">Login!</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-              Username:
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email:
             </label>
             <input
               type="email"
-              id="username"
-              name="username"
+              id="email"
+              name="email"
               placeholder="example@gmail.com"
               className="rounded-lg p-2 m-2 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-400 w-full"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email} // Corrected from username to email
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>

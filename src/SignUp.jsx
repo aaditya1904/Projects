@@ -3,22 +3,34 @@ import "../src/index.css";
 import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
-  const nav = useNavigate();
-  const handelClick = () => {
-    nav("/");
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate("/");
   };
-  
+
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault(); 
-    console.log("Name:", name);
-    console.log("Contact:", contact);
-    console.log("Email:", email);
-    nav("/Registerd");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch(`http://localhost:5000/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, contact, email, password }), // Include name and contact
+    });
+
+    if (response.ok) {
+      alert('User  registered successfully!');
+      navigate('/'); 
+    } else {
+      const data = await response.json();
+      console.error("Signup failed:", data.message || response.statusText);
+      alert(data.message || 'Signup failed. Please try again.');
+    }
   };
 
   return (
@@ -52,7 +64,7 @@ export default function SignUp() {
               Phone No.:
             </label>
             <input
-              type="number"
+              type="tel" // Changed to 'tel' for better input handling
               id="contact"
               name="contact"
               placeholder="Phone number"
@@ -80,33 +92,32 @@ export default function SignUp() {
               required
             />
           </div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password:
-            </label>
-            <input
-              type="password"
-              id="pass"
-              name="password"
-              placeholder="password"
-              className="rounded-lg p-2 m-2 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-400 w-full"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Password:
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="password"
+            className="rounded-lg p-2 m-2 border border-gray-300 focus:outline-none focus:ring focus:ring-blue-400 w-full"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
-            onClick={handleSubmit}
           >
             Submit
           </button>
           <button
             type="button"
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200 mt-1"
-            onClick={handelClick}
+            onClick={handleClick}
           >
             Sign-In
           </button>
@@ -114,4 +125,4 @@ export default function SignUp() {
       </div>
     </div>
   );
-}
+} 
